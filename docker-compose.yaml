@@ -1,0 +1,32 @@
+ersion: '3'
+services:
+  api:
+    image: ahmedmohamed1101140/voting-chain
+    build: .
+    networks:
+      - backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    networks:
+      - backend
+    ports:
+      - "27017:27017"
+
+  web-cli:
+    image: ahmedmohamed1101140/voting-chain
+    links:
+      - mongo
+    networks:
+      - backend
+    command: sh
+
+networks:
+  backend:
+    driver: bridge
