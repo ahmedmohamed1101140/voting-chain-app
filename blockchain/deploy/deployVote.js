@@ -15,6 +15,7 @@ const deploy = async () => {
 	.deploy({data: bytecode, arguments: []})
 	.send({gas: '1000000', from: accounts[0]});	
 	console.log('Contract deployed to', result.options.address);
+	return result.options.address;
 };
 
-deploy();
+module.exports = deploy;

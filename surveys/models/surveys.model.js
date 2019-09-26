@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const createVoteContract = require('../../blockchain/deploy/deployVote.js');
+const createSurveyContract = require('../../blockchain/deploy/deploySurvey.js');
 
 
 const surveySchema = new Schema({
@@ -60,8 +62,16 @@ exports.findById = (id) => {
         });
 };
 
-exports.createSurvey = (surveyData) => {
+exports.createSurvey = async (surveyData) => {
+    if(surveyData.type == 'Vote') {
+        const data = await createVoteContract();
+        surveyData['contractID'] = data;
+    } else {
+        const data = await createSurveyContract();
+        surveyData['contractID'] = data;
+    }
     const survey = new Survey(surveyData);
+    populateContract(surveyData);
     return survey.save();
 };
 
@@ -107,3 +117,11 @@ exports.removeById = (surveyId) => {
         });
     });
 };
+
+
+// HELPER FUNCTIONS
+
+
+function populateContract(surveyData) {
+    
+}

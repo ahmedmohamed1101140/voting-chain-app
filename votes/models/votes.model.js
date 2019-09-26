@@ -41,7 +41,6 @@ exports.findById = (id) => {
 };
 
 exports.createVote = (vateData) => {
-    console.log(vateData);
     const vote = new Vote(vateData);
     return vote.save();
 };
