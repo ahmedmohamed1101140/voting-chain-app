@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 
 
 const voteSchema = new Schema({
-    voteID: String,
-    ContractID: String,
-    SurveyID: String,
+    voteId: String,
+    contractId: String,
+    surveyId: String,
     answers: [
         {
         }
