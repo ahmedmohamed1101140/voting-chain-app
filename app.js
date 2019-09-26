@@ -7,6 +7,7 @@ const parser = require("body-parser");
 
 const UsersRouter = require('./users/routes.config');
 const SurveysRouter = require('./surveys/routes.config');
+const VotesRouter = require('./votes/routes.config');
 
 
 
@@ -34,6 +35,7 @@ app.use(function (req, res, next) {
 
 UsersRouter.routesConfig(app);
 SurveysRouter.routesConfig(app);
+VotesRouter.routesConfig(app);
 
 
 //normal errors handling

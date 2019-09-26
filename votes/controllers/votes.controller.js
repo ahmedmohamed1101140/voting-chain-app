@@ -1,7 +1,7 @@
-const UserModel = require('../models/users.model');
+const VoteModel = require('../models/votes.model');
 
 exports.insert = (req, res) => {
-    UserModel.createUser(req.body)
+    VoteModel.createVote(req.body)
         .then((result) => {
             res.status(201).send({id: result._id});
         });
@@ -16,28 +16,28 @@ exports.list = (req, res) => {
             page = Number.isInteger(req.query.page) ? req.query.page : 0;
         }
     }
-    UserModel.list(limit, page)
+    VoteModel.list(limit, page)
         .then((result) => {
             res.status(200).send(result);
         })
 };
 
 exports.getById = (req, res) => {
-    UserModel.findById(req.params.userId)
+    VoteModel.findById(req.params.voteId)
         .then((result) => {
             res.status(200).send(result);
         });
 };
 exports.patchById = (req, res) => {
-    UserModel.patchUser(req.params.userId, req.body)
+    VoteModel.patchSurvey(req.params.voteId, req.body)
         .then((result) => {
             res.status(204).send({});
-        });
+        }); 
 
 };
 
 exports.removeById = (req, res) => {
-    UserModel.removeById(req.params.userId)
+    VoteModel.removeById(req.params.voteId)
         .then((result)=>{
             res.status(204).send({});
         });
