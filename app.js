@@ -6,7 +6,7 @@ const morgan = require("morgan");
 const parser = require("body-parser");
 
 const UsersRouter = require('./users/routes.config');
-const ServeysRouter = require('./surveys/routes.config');
+const SurveysRouter = require('./surveys/routes.config');
 
 
 
@@ -33,7 +33,7 @@ app.use(function (req, res, next) {
  
 
 UsersRouter.routesConfig(app);
-ServeysRouter.routesConfig(app);
+SurveysRouter.routesConfig(app);
 
 
 //normal errors handling

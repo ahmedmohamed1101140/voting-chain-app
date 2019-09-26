@@ -2,19 +2,15 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-const serveySchema = new Schema({
+const surveySchema = new Schema({
     title: String,
     description: String,
-    type: {
-        type: [{
-          type: String,
-          enum: ['Survey', 'Election', 'Vote']
-        }],
-        default: ['Survey']
-      },
+    type: {type: String , default: 'Survey'}, //['Survey', 'Election', 'Vote']
+    status: {type: String , default: 'Pinding'}, //['Pinding', 'completed']
+    expiryStatus: {type: Boolean , default: false},
     createdAt: {type: Date , default: Date.now()},
-    expiryDate: {type: Date},
     owner: String,
+    contractID: String,
     points: { type: Number, default: 0 },
     questions: [
         {
@@ -27,28 +23,33 @@ const serveySchema = new Schema({
             ]
         } 
     ],
+    voters:[
+        {
+            MSISDN: String
+        }
+    ]
  });
 
 
-serveySchema.virtual('id').get(function () {
+surveySchema.virtual('id').get(function () {
     return this._id.toHexString();
 });
 
 // Ensure virtual fields are serialised.
-serveySchema.set('toJSON', {
+surveySchema.set('toJSON', {
     virtuals: true
 });
 
-serveySchema.findById = function (cb) {
-    return this.model('Serveys').find({id: this.id}, cb);
+surveySchema.findById = function (cb) {
+    return this.model('Surveys').find({id: this.id}, cb);
 };
 
-const Servey = mongoose.model('Serveys', serveySchema);
+const Survey = mongoose.model('Surveys', surveySchema);
 
 
 
 exports.findById = (id) => {
-    return Servey.findById(id)
+    return Survey.findById(id)
         .then((result) => {
             result = result.toJSON();
             delete result._id;
@@ -57,45 +58,45 @@ exports.findById = (id) => {
         });
 };
 
-exports.createServey = (serveyData) => {
-    const servey = new Servey(serveyData);
-    return servey.save();
+exports.createSurvey = (surveyData) => {
+    const survey = new Survey(surveyData);
+    return survey.save();
 };
 
 exports.list = (perPage, page) => {
     return new Promise((resolve, reject) => {
-        Servey.find()
+        Survey.find()
             .limit(perPage)
             .skip(perPage * page)
-            .exec(function (err, serveys) {
+            .exec(function (err, surveys) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(serveys);
+                    resolve(surveys);
                 }
             })
     });
 };
 
-exports.patchServey = (id, serveyData) => {
+exports.patchSurvey = (id, surveyData) => {
     return new Promise((resolve, reject) => {
-        Servey.findById(id, function (err, servey) {
+        Survey.findById(id, function (err, survey) {
             if (err) reject(err);
-            for (let i in serveyData) {
-                servey[i] = serveyData[i];
+            for (let i in surveyData) {
+                survey[i] = surveyData[i];
             }
-            servey.save(function (err, updatedServey) {
+            survey.save(function (err, updatedSurvey) {
                 if (err) return reject(err);
-                resolve(updatedServey);
+                resolve(updatedSurvey);
             });
         });
     })
 
 };
 
-exports.removeById = (serveyId) => {
+exports.removeById = (surveyId) => {
     return new Promise((resolve, reject) => {
-        Servey.remove({_id: serveyId}, (err) => {
+        Survey.remove({_id: surveyId}, (err) => {
             if (err) {
                 reject(err);
             } else {

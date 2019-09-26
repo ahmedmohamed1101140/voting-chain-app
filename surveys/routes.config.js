@@ -1,4 +1,4 @@
-const SurveysController = require('./controllers/serveys.controller');
+const SurveysController = require('./controllers/surveys.controller');
 
 
 exports.routesConfig = function (app) {
@@ -8,13 +8,13 @@ exports.routesConfig = function (app) {
     app.get('/surveys', [
         SurveysController.list
     ]);
-    app.get('/surveys/:serveyId', [
+    app.get('/surveys/:surveyId', [
         SurveysController.getById
     ]);
-    app.patch('/surveys/:serveyId', [
+    app.patch('/surveys/:surveyId', [
         SurveysController.patchById
     ]);
-    app.delete('/surveys/:serveyId', [
+    app.delete('/surveys/:surveyId', [
         SurveysController.removeById
     ]);
 };
