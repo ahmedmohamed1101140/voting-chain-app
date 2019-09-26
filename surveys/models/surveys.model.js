@@ -8,6 +8,8 @@ const surveySchema = new Schema({
     type: {type: String , default: 'Survey'}, //['Survey', 'Election', 'Vote']
     status: {type: String , default: 'Pinding'}, //['Pinding', 'completed']
     expiryStatus: {type: Boolean , default: false},
+    expiryDate: String,
+    viewResults: {type: Boolean , default: true},
     createdAt: {type: Date , default: Date.now()},
     owner: String,
     contractID: String,
