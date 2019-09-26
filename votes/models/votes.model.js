@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 
 const voteSchema = new Schema({
-    voteId: String,
+    voterId: String,
     contractId: String,
     surveyId: String,
     answers: [
