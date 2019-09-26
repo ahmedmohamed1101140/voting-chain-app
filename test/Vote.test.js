@@ -3,17 +3,17 @@ const ganache = require('ganache-cli');
 const Web3 = require('web3');
 const provider = ganache.provider();
 const web3 = new Web3(provider);
-const { interface, bytecode } = require ('../compile/compileSurvey.js');
+const { interface, bytecode } = require ('../blockchain/compile/compileVote.js');
 
 let accounts;
-let survey; 
+let vote; 
 
 beforeEach (async () => {
 	//get a list of all accounts
 	accounts = await web3.eth.getAccounts();
 
 	 //use one of those accounts to deploy the contract
-	survey = await new web3.eth.Contract(JSON.parse(interface))
+	vote = await new web3.eth.Contract(JSON.parse(interface))
 	 	.deploy({
 	 		data: bytecode,
 	 		arguments: []
@@ -23,12 +23,12 @@ beforeEach (async () => {
 	 		gas: '1000000'
 	 	});
 
-	 survey.setProvider(provider);
+	 vote.setProvider(provider);
 });
 
-describe('Survey', () => {
+describe('Vote', () => {
 	it ('contract is now deployed', () => {
-		assert.ok(survey.options.address);
+		assert.ok(vote.options.address);
 	});
 
 	// it ('has a default message', async () => {
