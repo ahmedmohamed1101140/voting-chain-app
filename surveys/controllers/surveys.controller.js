@@ -57,13 +57,13 @@ exports.list = (req, res) => {
 };
 
 exports.getById = (req, res) => {
-    SurveyModel.findById(req.params.serveyId)
+    SurveyModel.findById(req.params.surveyId)
         .then((result) => {
             res.status(200).send(result);
         });
 };
 exports.patchById = (req, res) => {
-    SurveyModel.patchSurvey(req.params.serveyId, req.body)
+    SurveyModel.patchSurvey(req.params.surveyId, req.body)
         .then((result) => {
             res.status(204).send({});
         }); 
@@ -71,7 +71,7 @@ exports.patchById = (req, res) => {
 };
 
 exports.removeById = (req, res) => {
-    SurveyModel.removeById(req.params.serveyId)
+    SurveyModel.removeById(req.params.surveyId)
         .then((result)=>{
             res.status(204).send({});
         });
