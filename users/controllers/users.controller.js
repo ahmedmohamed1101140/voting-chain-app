@@ -28,6 +28,14 @@ exports.getById = (req, res) => {
             res.status(200).send(result);
         });
 };
+
+exports.getByphone = (req, res) => {
+    UserModel.findByPhone(req.params.userPhone)
+        .then((result) => {
+            res.status(200).send(result);
+        });
+};
+
 exports.patchById = (req, res) => {
     UserModel.patchUser(req.params.userId, req.body)
         .then((result) => {
