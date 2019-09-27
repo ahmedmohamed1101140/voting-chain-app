@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     name: String,
     email: String,
-    phone: Number,
+    phone: String,
     points: { type: Number, default: 0 },
     mySurveys: [
         {
