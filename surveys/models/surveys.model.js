@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const createVoteContract = require('../../blockchain/deploy/deployVote.js');
-const createSurveyContract = require('../../blockchain/deploy/deploySurvey.js');
+// const createVoteContract = require('../../blockchain/deploy/deployVote.js');
+// const createSurveyContract = require('../../blockchain/deploy/deploySurvey.js');
 
 
 const surveySchema = new Schema({
