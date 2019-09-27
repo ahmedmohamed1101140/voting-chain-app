@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     name: String,
     email: String,
-    phone: Number,
+    phone: String,
     points: { type: Number, default: 0 },
     mySurveys: [
         {
@@ -32,8 +32,8 @@ userSchema.findById = function (cb) {
 const User = mongoose.model('Users', userSchema);
 
 
-exports.findByEmail = (email) => {
-    return User.find({email: email});
+exports.findByPhone = (phone) => {
+    return User.find({phone: phone});
 };
 exports.findById = (id) => {
     return User.findById(id)
@@ -71,7 +71,7 @@ exports.patchUser = (id, userData) => {
         User.findById(id, function (err, user) {
             if (err) reject(err);
             for (let i in userData) {
-                if(userData.mySurveys){
+                if(i == "mySurveys"){
                     user[i].push(userData[i]);
                 }
                 else{

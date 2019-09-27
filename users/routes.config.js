@@ -11,6 +11,9 @@ exports.routesConfig = function (app) {
     app.get('/users/:userId', [
         UsersController.getById
     ]);
+    app.get('/userphone/:userPhone', [
+        UsersController.getByphone
+    ]);
     app.patch('/users/:userId', [
         UsersController.patchById
     ]);
