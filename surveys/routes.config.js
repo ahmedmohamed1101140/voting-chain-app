@@ -11,6 +11,9 @@ exports.routesConfig = function (app) {
     app.get('/surveys/:surveyId', [
         SurveysController.getById
     ]);
+    app.get('/surveyResults/:surveyId', [
+        SurveysController.getResult
+    ]);
     app.patch('/surveys/:surveyId', [
         SurveysController.patchById
     ]);

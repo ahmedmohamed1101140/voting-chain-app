@@ -62,6 +62,14 @@ exports.getById = (req, res) => {
             res.status(200).send(result);
         });
 };
+
+exports.getResult = (req, res) => {
+    SurveyModel.getResult(req.params.surveyId)
+        .then((result) => {
+            res.status(200).send(result);
+        });
+};
+
 exports.patchById = (req, res) => {
     SurveyModel.patchSurvey(req.params.surveyId, req.body)
         .then((result) => {

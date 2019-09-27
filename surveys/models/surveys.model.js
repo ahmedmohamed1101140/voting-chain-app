@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const createVoteContract = require('../../blockchain/deploy/deployVote.js');
 const createSurveyContract = require('../../blockchain/deploy/deploySurvey.js');
+const HDWalletProvider = require ('truffle-hdwallet-provider');
+let Web3 = require("web3");
+const BigNumber = require('bignumber.js');
 
 
 const surveySchema = new Schema({
@@ -15,14 +18,16 @@ const surveySchema = new Schema({
     createdAt: {type: Date , default: Date.now()},
     owner: String,
     contractID: String,
+    interface: String,
     points: { type: Number, default: 0 },
     questions: [
         {
             content: String,
             answers:[
                 {
+                    id: String,
                     content: String,
-                    points: Number,
+                    points: Number
                 }
             ]
         } 
@@ -62,24 +67,39 @@ exports.findById = (id) => {
         });
 };
 
+exports.getResult = (id) => {
+    return Survey.findById(id)
+        .then(async (result) => {
+            const surveyResults = await getResultFromBlockChain(result);
+            result.questions[0].answers = surveyResults;
+            result = result.toJSON();
+            console.log("FINAL RESULT", result);
+            delete result._id;
+            delete result.__v;
+            return result;
+        });
+}
+
 exports.createSurvey = async (surveyData) => {
     if(surveyData.type == 'Vote') {
         const data = await createVoteContract();
-        surveyData['contractID'] = data;
+        surveyData['contractID'] = data.address;
+        surveyData['interface'] = data.interface;
     } else {
         const data = await createSurveyContract();
-        surveyData['contractID'] = data;
+        surveyData['contractID'] = data.address;
+        surveyData['interface'] = data.interface;
     }
-    const survey = new Survey(surveyData);
-    populateContract(surveyData);
-    return survey.save();
+    const survey = await new Survey(surveyData).save();
+    populateContract(survey);
+    return survey;
 };
 
 exports.list = (perPage, page) => {
     return new Promise((resolve, reject) => {
         Survey.find()
-            .limit(perPage)
-            .skip(perPage * page)
+            // .limit(perPage)
+            // .skip(perPage * page)
             .exec(function (err, surveys) {
                 if (err) {
                     reject(err);
@@ -120,8 +140,42 @@ exports.removeById = (surveyId) => {
 
 
 // HELPER FUNCTIONS
+async function populateContract(surveyData) {
+    const provider = new HDWalletProvider(
+        'brown judge skin famous undo opera eyebrow law phrase gossip attitude sunny',
+        'https://rinkeby.infura.io/v3/d18cbd70fef8401ea8ce53f79f52564d'
+    );
+    const web3 = new Web3(provider);
+    const accounts = await web3.eth.getAccounts();
+    console.log(surveyData);
+    let contract = await new web3.eth.Contract(JSON.parse(surveyData.interface), surveyData.contractID);
+    for(var i=0; i<surveyData.questions[0].answers.length; i++) {
+        console.log(surveyData.questions[0]);
+        let candidateName = surveyData.questions[0].answers[i].content;
+        let candidateID = surveyData.questions[0].answers[i].id;
+        await contract.methods.addCandidate(new BigNumber(candidateID).toNumber(), candidateName).send({gas: '1000000', from: accounts[0]});
+    }
+    console.log("Contract Populated");
+}
 
+async function getResultFromBlockChain(surveyData) {
+    const provider = new HDWalletProvider(
+        'brown judge skin famous undo opera eyebrow law phrase gossip attitude sunny',
+        'https://rinkeby.infura.io/v3/d18cbd70fef8401ea8ce53f79f52564d'
+    );
+    const web3 = new Web3(provider);
+    const accounts = await web3.eth.getAccounts();
+    let contract = await new web3.eth.Contract(JSON.parse(surveyData.interface), surveyData.contractID);
+    const voteResults = [];
+    for(var i=0; i<surveyData.questions[0].answers.length; i++) {
+        let candidateVoteCount = await contract.methods.voteResults(new BigNumber(surveyData.questions[0].answers[i].id).toNumber()).call();
+        voteResults.push({
+            'content': surveyData.questions[0].answers[i].content,
+            'id': surveyData.questions[0].answers[i].id,
+            'points': candidateVoteCount
+        })
+    }
+    console.log("Results", voteResults);
+    return voteResults;
 
-function populateContract(surveyData) {
-    
 }

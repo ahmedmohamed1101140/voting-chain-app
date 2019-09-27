@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 
-var  url = process.env.DATABASEURL || "mongodb://localhost:27017/voring-chain";
+// var  url = process.env.DATABASEURL || "mongodb://localhost:27017/voting-chain";
+var  url = "mongodb://localhost:27017/voting-chain";
 //var  url = "mongodb://localhost:27017/lms_app";
 
 

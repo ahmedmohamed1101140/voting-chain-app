@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
-const User = require('../../users/models/users.model')
+const User = require('../../users/models/users.model');
+const survey = require('../../surveys/models/surveys.model.js');
 const Schema = mongoose.Schema;
+const HDWalletProvider = require ('truffle-hdwallet-provider');
+let Web3 = require("web3");
+const BigNumber = require('bignumber.js');
 
 
 const voteSchema = new Schema({
@@ -41,8 +45,9 @@ exports.findById = (id) => {
         });
 };
 
-exports.createVote = (vateData) => {
-    const vote = new Vote(vateData);
+exports.createVote = async (voteData) => {
+    const vote = new Vote(voteData);
+    await blockChainVote(voteData);
     return vote.save();
 };
 
@@ -88,3 +93,17 @@ exports.removeById = (voteId) => {
         });
     });
 };
+
+async function blockChainVote (voteData){
+    console.log(voteData);
+    let surveyObj = await survey.findById(voteData.surveyId);
+    const provider = new HDWalletProvider(
+        'brown judge skin famous undo opera eyebrow law phrase gossip attitude sunny',
+        'https://rinkeby.infura.io/v3/d18cbd70fef8401ea8ce53f79f52564d'
+    );
+    const web3 = new Web3(provider);
+    const accounts = await web3.eth.getAccounts();
+    let contract = await new web3.eth.Contract(JSON.parse(surveyObj.interface), voteData.contractId);
+    await contract.methods.vote(new BigNumber(voteData.voterId).toNumber(),new BigNumber(voteData.answers[0].id).toNumber()).send({gas: '1000000', from: accounts[0]});
+    console.log("Vote Submitted");
+}

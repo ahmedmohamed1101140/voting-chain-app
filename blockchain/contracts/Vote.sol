@@ -3,9 +3,8 @@ pragma solidity ^0.4.18;
 contract Vote {
 
     struct Voter {
-        uint userNationalID;
-        uint userMSISDN;
-        uint candidateNationalID;
+        uint userID;
+        uint candidateID;
     }
 
     struct Candidate {
@@ -17,31 +16,30 @@ contract Vote {
     mapping (uint => Candidate) candidates;
     mapping (uint => Voter) voters;
 
-    uint numCandidates = 3; 
+    uint numCandidates = 0; 
     uint numVoters = 0;
     bool voteEnded = false;
 
     // Functions //
-    function fillCandidates () public {
+    function addCandidate (uint candidateID, string name) public {
         // adding candidates for now
-        candidates[12345678912345] = Candidate("John", true, false);
-        candidates[12345678912346] = Candidate("Alex", true, false);
-        candidates[12345678912347] = Candidate("Peter", true, false);
+        candidates[candidateID] = Candidate(name, true, false);
+        numCandidates = numCandidates + 1;
     }
     
-    function vote(uint userNationalID, uint userMSISDN, uint candidateNationalID) public {
+    function vote(uint userID, uint candidateID) public {
         // checks if the struct exists for that candidate
-        if (candidates[candidateNationalID].exist == true) {
+        if (candidates[candidateID].exist == true) {
             uint voterID = numVoters;
-            voters[voterID] = Voter(userNationalID, userMSISDN, candidateNationalID);
+            voters[voterID] = Voter(userID, candidateID);
             numVoters = numVoters + 1 ;
         }
     }
 
-    function voteResults(uint candidateNationalID) view public returns (uint) {
+    function voteResults(uint candidateID) view public returns (uint) {
         uint numOfVotes = 0; // total number of votes for candidate national ID
         for (uint i = 0; i < numVoters; i++) {
-            if (voters[i].candidateNationalID == candidateNationalID) {
+            if (voters[i].candidateID == candidateID) {
                 numOfVotes = numOfVotes + 1;
             }
         }
@@ -56,7 +54,7 @@ contract Vote {
         return numVoters;
     }
     
-    function getCandidate(uint candidateNationalID) public view returns (uint,string) {
-        return (candidateNationalID,candidates[candidateNationalID].candidateName);
+    function getCandidate(uint candidateID) public view returns (uint,string) {
+        return (candidateID,candidates[candidateID].candidateName);
     }
 }
