@@ -71,7 +71,12 @@ exports.patchUser = (id, userData) => {
         User.findById(id, function (err, user) {
             if (err) reject(err);
             for (let i in userData) {
-                user[i] = userData[i];
+                if(userData.mySurveys){
+                    user[i].push(userData[i]);
+                }
+                else{
+                    user[i] = userData[i];
+                }
             }
             user.save(function (err, updatedUser) {
                 if (err) return reject(err);
