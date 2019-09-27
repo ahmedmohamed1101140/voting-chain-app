@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const createVoteContract = require('../../blockchain/deploy/deployVote.js');
-const createSurveyContract = require('../../blockchain/deploy/deploySurvey.js');
+const createSurveyContract = require('../../blockchain/deploy/deployVote.js');
 const HDWalletProvider = require ('truffle-hdwallet-provider');
 let Web3 = require("web3");
 const BigNumber = require('bignumber.js');
@@ -71,7 +70,7 @@ exports.getResult = (id) => {
     return Survey.findById(id)
         .then(async (result) => {
             const surveyResults = await getResultFromBlockChain(result);
-            result.questions[0].answers = surveyResults;
+            result.questions = surveyResults;
             result = result.toJSON();
             console.log("FINAL RESULT", result);
             delete result._id;
@@ -82,7 +81,7 @@ exports.getResult = (id) => {
 
 exports.createSurvey = async (surveyData) => {
     if(surveyData.type == 'Vote') {
-        const data = await createVoteContract();
+        const data = await createSurveyContract();
         surveyData['contractID'] = data.address;
         surveyData['interface'] = data.interface;
     } else {
@@ -149,12 +148,25 @@ async function populateContract(surveyData) {
     const accounts = await web3.eth.getAccounts();
     console.log(surveyData);
     let contract = await new web3.eth.Contract(JSON.parse(surveyData.interface), surveyData.contractID);
-    for(var i=0; i<surveyData.questions[0].answers.length; i++) {
-        console.log(surveyData.questions[0]);
-        let candidateName = surveyData.questions[0].answers[i].content;
-        let candidateID = surveyData.questions[0].answers[i].id;
-        await contract.methods.addCandidate(new BigNumber(candidateID).toNumber(), candidateName).send({gas: '1000000', from: accounts[0]});
+    if(surveyData.type == 'Vote') {
+        for(var i=0; i<surveyData.questions[0].answers.length; i++) {
+            console.log(surveyData.questions[0]);
+            let candidateName = surveyData.questions[0].answers[i].content;
+            let candidateID = surveyData.questions[0].answers[i].id;
+            await contract.methods.addCandidate(new BigNumber(candidateID).toNumber(), candidateName).send({gas: '1000000', from: accounts[0]});
+        }
+    } else {
+        console.log("SURVEY FLOW",surveyData.type);
+        for(var j=0; j<surveyData.questions.length; j++) {
+            for(var i=0; i<surveyData.questions[j].answers.length; i++) {
+                console.log(surveyData.questions[j]);
+                let candidateName = surveyData.questions[j].answers[i].content;
+                let candidateID = surveyData.questions[j].answers[i].id;
+                await contract.methods.addCandidate(new BigNumber(candidateID).toNumber(), candidateName).send({gas: '1000000', from: accounts[0]});
+            }
+        }
     }
+    
     console.log("Contract Populated");
 }
 
@@ -167,14 +179,20 @@ async function getResultFromBlockChain(surveyData) {
     const accounts = await web3.eth.getAccounts();
     let contract = await new web3.eth.Contract(JSON.parse(surveyData.interface), surveyData.contractID);
     const voteResults = [];
-    for(var i=0; i<surveyData.questions[0].answers.length; i++) {
-        let candidateVoteCount = await contract.methods.voteResults(new BigNumber(surveyData.questions[0].answers[i].id).toNumber()).call();
-        voteResults.push({
-            'content': surveyData.questions[0].answers[i].content,
-            'id': surveyData.questions[0].answers[i].id,
-            'points': candidateVoteCount
-        })
+    for(var j=0;j<surveyData.questions.length;j++){
+        const questionResult = [];
+        for(var i=0; i<surveyData.questions[j].answers.length; i++) {
+            let candidateVoteCount = await contract.methods.voteResults(new BigNumber(surveyData.questions[j].answers[i].id).toNumber()).call();
+            questionResult.push({
+                'content': surveyData.questions[j].answers[i].content,
+                'id': surveyData.questions[j].answers[i].id,
+                'points': candidateVoteCount
+            })
+        }
+        questionData = {'content': surveyData.questions[j].content, 'answers': questionResult}
+        voteResults.push(questionData);
     }
+    
     console.log("Results", voteResults);
     return voteResults;
 

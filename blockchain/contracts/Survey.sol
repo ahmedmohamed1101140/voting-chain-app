@@ -22,12 +22,11 @@ contract Survey {
     struct Answer {
         uint answerID;
         string answer;
-        uint questionID;
         bool exist;
     }
 
     // Functions //
-    function createAnswer (uint answerID, string text, uint questionID) public {
+    function createAnswer (uint answerID, string text) public {
         //adding answers for now
         answers[answerID] = Answer(answerID, text, questionID, true);
         answersCount = answersCount + 1;

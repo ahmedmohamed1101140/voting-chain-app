@@ -104,6 +104,8 @@ async function blockChainVote (voteData){
     const web3 = new Web3(provider);
     const accounts = await web3.eth.getAccounts();
     let contract = await new web3.eth.Contract(JSON.parse(surveyObj.interface), voteData.contractId);
-    await contract.methods.vote(new BigNumber(voteData.voterId).toNumber(),new BigNumber(voteData.answers[0].id).toNumber()).send({gas: '1000000', from: accounts[0]});
+    for(var i=0; i<voteData.answers.length; i++) {
+        await contract.methods.vote(new BigNumber(voteData.voterId).toNumber(),new BigNumber(voteData.answers[i].id).toNumber()).send({gas: '1000000', from: accounts[0]});
+    }    
     console.log("Vote Submitted");
 }
