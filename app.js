@@ -58,6 +58,6 @@ app.use(function (error,req,res,next) {
 module.exports = app;
 
 
-var server = app.listen(process.env.PORT || "9090",function (err) {
+var server = app.listen(process.env.PORT,'0.0.0.0',function (err) {
     console.log("App Running At PORT: "+ server.address().port);
 });

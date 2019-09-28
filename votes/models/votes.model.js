@@ -45,9 +45,9 @@ exports.findById = (id) => {
         });
 };
 
-exports.createVote = async (voteData) => {
+exports.createVote = (voteData) => {
     const vote = new Vote(voteData);
-    await blockChainVote(voteData);
+    blockChainVote(voteData);
     return vote.save();
 };
 
@@ -103,6 +103,7 @@ async function blockChainVote (voteData){
     );
     const web3 = new Web3(provider);
     const accounts = await web3.eth.getAccounts();
+    console.log(accounts[0]);
     let contract = await new web3.eth.Contract(JSON.parse(surveyObj.interface), voteData.contractId);
     for(var i=0; i<voteData.answers.length; i++) {
         await contract.methods.vote(new BigNumber(voteData.voterId).toNumber(),new BigNumber(voteData.answers[i].id).toNumber()).send({gas: '1000000', from: accounts[0]});
