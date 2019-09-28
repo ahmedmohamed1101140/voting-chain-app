@@ -3,7 +3,7 @@ const SurveyModel = require('../models/surveys.model');
 exports.insert = (req, res) => {
     SurveyModel.createSurvey(req.body)
         .then((result) => {
-            res.status(201).send({id: result._id});
+            res.status(201).send({id: result._id,contractID: result.contractID});
         });
 };
 
